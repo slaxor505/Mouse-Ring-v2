@@ -29,6 +29,7 @@ config = {
     'log_level': 'info',
     'log_to_disk': False,
     'blink_interval': 30000,        # lower to blink status more frequently
+    'advertising_battery_led': True,  # True - blink battery level colour while waiting for connection; False - blink blue
     'debounce_sleep': 0.15,         # for button debounce
     'sp_initial': 0.2,              # scroll settings
     'sp_accel': 0.015,              # scroll acceleration
@@ -272,7 +273,10 @@ while True:
                 enter_sleep()
 
             log('info',"Connecting...")
-            battery_leds()  # blink in the battery level colour while waiting for a connection
+            if config['advertising_battery_led']:
+                battery_leds()  # blink in the battery level colour
+            else:
+                blue_led.value = False
             time.sleep(0.5)
             leds_off()
             time.sleep(0.5)
