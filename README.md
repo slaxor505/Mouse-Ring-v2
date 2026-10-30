@@ -31,7 +31,7 @@ Of course, different configurations are possible for the Left and right Ring.
 
 2. LEDs communication
 
-- advertasing for connection: :large_blue_circle: blinking every second
+- advertasing for connection: blinking every second in the battery charge status colour (:green_circle: more then 80% or charged, :orange_circle: between 20-80%, :red_circle: less then 20%)
 - when connected (alternating at approximately every 5 seconds)
   - bluetooth connection confirmation: :large_blue_circle: blink
   - battery charge status: :green_circle: blink - more then 80%, :orange_circle: blink - between 20-80%, :red_circle: blink - less then 20%

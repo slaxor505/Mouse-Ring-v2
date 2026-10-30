@@ -192,6 +192,7 @@ def get_batt_percent(volts):
         3.54:	5,
         3.50:	0
     }
+    percent = 0  # below the lowest table entry (otherwise 'percent' is unset and the code crashes)
     for k in sorted(batt_table.keys(), reverse = True):
         v = batt_table[k]
         if volts < k:
@@ -271,9 +272,9 @@ while True:
                 enter_sleep()
 
             log('info',"Connecting...")
-            blue_led.value = False
+            battery_leds()  # blink in the battery level colour while waiting for a connection
             time.sleep(0.5)
-            blue_led.value = True
+            leds_off()
             time.sleep(0.5)
             # check if mouse movement is not set. If yes then skip Deep Sleep by click
             if not config['mouse_movement']:
