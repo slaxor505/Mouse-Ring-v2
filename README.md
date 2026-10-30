@@ -31,7 +31,7 @@ Of course, different configurations are possible for the Left and right Ring.
 
 2. LEDs communication
 
-- advertasing for connection: :large_blue_circle: blinking every second
+- advertasing for connection: blinking every second in the battery charge status colour (:green_circle: more then 80% or charged, :orange_circle: between 20-80%, :red_circle: less then 20%). Set `'advertising_battery_led': False` in _config.py_ to blink :large_blue_circle: instead
 - securing the connection (pairing / encryption): :large_blue_circle: continuous light for a few seconds after connecting
 - connection could not be secured: :red_circle: 3 fast blinks, then the ring disconnects and advertises again (see [Troubleshooting](#troubleshooting))
 - when connected (alternating at approximately every 5 seconds)

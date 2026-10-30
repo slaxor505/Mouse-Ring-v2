@@ -30,6 +30,7 @@ config = {
     'log_level': 'info',
     'log_to_disk': False,
     'blink_interval': 30000,        # lower to blink status more frequently
+    'advertising_battery_led': True,  # True - blink battery level colour while waiting for connection; False - blink blue
     'debounce_sleep': 0.15,         # for button debounce
     'sp_initial': 0.2,              # scroll settings
     'sp_accel': 0.015,              # scroll acceleration
@@ -339,9 +340,12 @@ while True:
                 enter_sleep()
 
             log('info',"Connecting...")
-            blue_led.value = False
+            if config['advertising_battery_led']:
+                battery_leds()  # blink in the battery level colour
+            else:
+                blue_led.value = False
             time.sleep(0.5)
-            blue_led.value = True
+            leds_off()
             time.sleep(0.5)
             # check if mouse movement is not set. If yes then skip Deep Sleep by click
             if not config['mouse_movement']:
