@@ -32,6 +32,8 @@ Of course, different configurations are possible for the Left and right Ring.
 2. LEDs communication
 
 - advertasing for connection: blinking every second in the battery charge status colour (:green_circle: more then 80% or charged, :orange_circle: between 20-80%, :red_circle: less then 20%). Set `'advertising_battery_led': False` in _config.py_ to blink :large_blue_circle: instead
+- securing the connection (pairing / encryption): :large_blue_circle: continuous light for a few seconds after connecting
+- connection could not be secured: :red_circle: 3 fast blinks, then the ring disconnects and advertises again (see [Troubleshooting](#troubleshooting))
 - when connected (alternating at approximately every 5 seconds)
   - bluetooth connection confirmation: :large_blue_circle: blink
   - battery charge status: :green_circle: blink - more then 80%, :orange_circle: blink - between 20-80%, :red_circle: blink - less then 20%
@@ -52,6 +54,7 @@ Waking up occurs by clicking the joystick.
 ## Pre-work with the microcontroller
 
 1. Download CircuitPython .uf2 dedicated boot loader from [here](https://circuitpython.org/board/Seeed_XIAO_nRF52840_Sense/).
+   Use **CircuitPython 10.3.1 or newer**: it fixes nRF52840 Bluetooth bonding bugs that can leave the ring connected with non-working buttons. Your current version is shown in _boot_out.txt_ on the CIRCUITPY drive.
 2. Installing CircuitPython on the microcontroller according the [instruction](https://learn.adafruit.com/welcome-to-circuitpython).
    Simplifying: is needed to reset and enter "boot" mode by quickly pressing the "Reset" button twice.
 
@@ -105,3 +108,17 @@ Correct files structure on the CIRCUITPY:
 ![Files](/images/files.png)
 
 Reconnect device. Will be visible for Bluetooth and ready to connect.
+
+## Troubleshooting
+
+### Ring is connected but buttons do nothing
+
+The mouse buttons only work over an encrypted (paired) Bluetooth link. If the computer and the ring disagree about their pairing keys, Windows shows the ring as connected but ignores its buttons.
+
+The ring now checks this after every connection. If the link is not encrypted within a few seconds it asks the computer to pair, and if that fails it blinks :red_circle: 3 times, disconnects and advertises again so the computer can reconnect cleanly.
+
+If the 3 red blinks keep repeating:
+
+1. Remove the ring in Windows Bluetooth settings and pair it again.
+2. Make sure the ring runs CircuitPython 10.3.1 or newer (see _boot_out.txt_), with libraries from the matching bundle.
+3. To see what happens, connect the ring by USB and open the serial console (e.g. with [Mu](https://codewith.mu/) or [Thonny](https://thonny.org/)). Messages such as `Link not encrypted, requesting pairing` show each step.
