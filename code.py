@@ -12,6 +12,7 @@ from seeed_xiao_nrf52840 import Battery
 from adafruit_ble.services.standard import BatteryService
 
 # imports needed for bluetooth
+import _bleio
 import adafruit_ble
 from adafruit_ble.advertising import Advertisement
 from adafruit_ble.advertising.standard import ProvideServicesAdvertisement
@@ -33,7 +34,9 @@ config = {
     'sp_initial': 0.2,              # scroll settings
     'sp_accel': 0.015,              # scroll acceleration
     'sp_max': 0.02,                 # max scroll speed
-    'movement_accel_delay': 0.15    # mouse movement acceleration delay
+    'movement_accel_delay': 0.15,   # mouse movement acceleration delay
+    'pair_request_delay': 3,        # seconds to wait for the host to encrypt the link before asking it to
+    'pair_timeout': 20              # seconds without an encrypted link before disconnecting to retry
 }
 config.update(hand_config)
 
@@ -192,6 +195,7 @@ def get_batt_percent(volts):
         3.54:	5,
         3.50:	0
     }
+    percent = 0  # below the lowest table entry (otherwise 'percent' is unset and the code crashes)
     for k in sorted(batt_table.keys(), reverse = True):
         v = batt_table[k]
         if volts < k:
@@ -230,8 +234,72 @@ def leds_off():
     red_led.value = True  # reset LED status
 
 
+# Signals that the host connected but the link could not be encrypted
+def pairing_error_leds():
+    leds_off()
+    for _ in range(3):
+        red_led.value = False
+        time.sleep(0.2)
+        red_led.value = True
+        time.sleep(0.2)
+
+
+# HID reports are only delivered over an encrypted (paired) link. The
+# host sometimes reconnects without encrypting it - the ring then shows
+# as connected but the buttons do nothing. Wait for encryption, ask the
+# host for it if it doesn't come, and drop the link if it still fails so
+# the host reconnects from scratch. Returns True when the link is usable.
+def ensure_paired():
+    start = time.monotonic()
+    pair_requested = False
+    blue_led.value = False  # solid blue while securing the link
+    while ble.connected:
+        connections = ble.connections
+        if not connections:
+            break
+        connection = connections[0]
+        try:
+            paired = connection.paired
+        except ConnectionError:
+            break   # link dropped between checks
+        if paired:
+            log('info', "Link encrypted")
+            leds_off()
+            return True
+        elapsed = time.monotonic() - start
+        if not pair_requested and elapsed >= config['pair_request_delay']:
+            pair_requested = True
+            log('warn', "Link not encrypted, requesting pairing")
+            try:
+                connection.pair()   # blocks until pairing succeeds, fails or the link drops
+            except (_bleio.BluetoothError, ConnectionError) as e:
+                log('warn', f"Pairing request failed: {e}")
+        elif elapsed >= config['pair_timeout']:
+            log('error', "No encrypted link, disconnecting. If this repeats, remove the ring in the host's Bluetooth settings and pair again")
+            try:
+                connection.disconnect()
+            except ConnectionError:
+                pass
+            pairing_error_leds()
+            # give the disconnect time to complete before advertising again
+            wait_until = time.monotonic() + 5
+            while ble.connected and time.monotonic() < wait_until:
+                time.sleep(0.1)
+            break
+        else:
+            time.sleep(0.1)
+    leds_off()
+    return False
+
+
 # Deep Sleep
 def enter_sleep():
+    # Disconnect cleanly so the host isn't left waiting for the link to time out
+    for connection in ble.connections:
+        try:
+            connection.disconnect()
+        except ConnectionError:
+            pass
     leds_off()
     time.sleep(0.2)
     red_led.value = False
@@ -291,6 +359,9 @@ while True:
         # Now we're connected
         ble.stop_advertising()
         log('info',f"Connected {ble.connections}")
+
+    if not ensure_paired():
+        continue  # link dropped or was not secured - advertise again
 
     while ble.connected:
 
