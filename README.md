@@ -140,7 +140,7 @@ Use these steps to move a ring from an older CircuitPython (e.g. 9.x) to 10.3.1 
      - /adafruit_register
      - /adafruit_bus_device
 
-   > **Note**: Do not copy the _lib_ folder from this repository. It was built for an older CircuitPython and is incomplete.
+   > **Note**: Do not reuse library files from an older ring or an older copy of this project. They are built for an older CircuitPython and may not load.
 
 5. Copy the new code from the ZIP onto CIRCUITPY, replacing the old files:
    - _code.py_
