@@ -109,6 +109,66 @@ Correct files structure on the CIRCUITPY:
 
 Reconnect device. Will be visible for Bluetooth and ready to connect.
 
+## Updating an existing ring
+
+Use these steps to move a ring from an older CircuitPython (e.g. 9.x) to 10.3.1 or newer and install the latest code. Repeat them for each ring.
+
+1. Prepare
+   - Download this repository: **Code → Download ZIP**, then unzip it.
+   - In Windows remove the ring: _Settings → Bluetooth & devices →_ the ring _→ Remove device_. This clears the old pairing keys.
+
+2. Back up the ring
+   - Connect the ring by USB. The **CIRCUITPY** drive appears.
+   - Copy everything from it to a folder on your PC.
+   - Open _boot_out.txt_ and note the **Board ID** (e.g. `seeed_xiao_nrf52840_sense`).
+
+3. Update the firmware
+   - On [circuitpython.org/downloads](https://circuitpython.org/downloads) open the board matching your Board ID and download the latest **stable** _.uf2_ file (10.3.1 or newer, not alpha or beta).
+   - Quickly press the reset button twice. A boot drive (e.g. `XIAO-SENSE`) appears.
+   - Copy the _.uf2_ file onto it. The ring restarts and **CIRCUITPY** comes back.
+   - Check that _boot_out.txt_ shows the new version.
+
+   > **Note**: Files on CIRCUITPY normally survive a firmware update. The backup is there in case they don't.
+
+4. Update the libraries. Libraries must match the CircuitPython major version, so the 9.x ones must be replaced.
+   - On [circuitpython.org/libraries](https://circuitpython.org/libraries) download the bundle for your version (e.g. **10.x**) and unzip it.
+   - On CIRCUITPY delete the old _lib_ folder and create a new, empty _lib_ folder.
+   - From the bundle's _lib_ folder copy these folders into it:
+     - /adafruit_ble
+     - /adafruit_hid
+     - /adafruit_lsm6ds
+     - /adafruit_register
+     - /adafruit_bus_device
+
+   > **Note**: Do not reuse library files from an older ring or an older copy of this project. They are built for an older CircuitPython and may not load.
+
+5. Copy the new code from the ZIP onto CIRCUITPY, replacing the old files:
+   - _code.py_
+   - _seeed_xiao_nrf52840.py_
+   - _left_config.py_ renamed to _config.py_ for the left ring, or _right_config.py_ renamed to _config.py_ for the right ring.
+
+   If you changed your old _config.py_ (name, pins, `mouse_movement`, ...), make the same changes in the new one. Your backup has the old file.
+
+6. (Optional) Erase the old pairing data on the ring for a clean start
+   - Open [Thonny](https://thonny.org/) and choose the **CircuitPython** interpreter (bottom-right corner).
+   - Press **Stop**, then type in the Shell:
+     ```python
+     import _bleio
+     _bleio.adapter.erase_bonding()
+     ```
+   - Close Thonny.
+
+7. Pair again
+   - Unplug USB. The LED blinks every second in the battery colour while waiting for a connection.
+   - In Windows: _Add device → Bluetooth_ and choose the ring.
+   - The blue LED stays on for a few seconds while the connection is secured, then the buttons work.
+
+If something goes wrong:
+
+- **No blinking:** open Thonny and read the error in the Shell. `ImportError` means a library is missing, so copy it from the bundle.
+- **3 red blinks after connecting:** remove the ring in Windows and pair once more.
+- **To go back:** flash the old _.uf2_ the same way and restore your backup.
+
 ## Troubleshooting
 
 ### Ring is connected but buttons do nothing
