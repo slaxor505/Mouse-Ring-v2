@@ -62,26 +62,17 @@ Waking up occurs by clicking the joystick.
 
    Then copy the .uf2 file to the device. The microcontroller will reset automatically.
 
-3. Add selected CircuitPython library files. Can be download from the [official libraries](https://circuitpython.org/libraries) on the CircuitPython website. Required libriaries are:
+3. Add the CircuitPython libraries. Download the bundle that matches your CircuitPython version (e.g. **10.x**) from the [official libraries](https://circuitpython.org/libraries) page and unzip it. Copy these folders from the bundle's _lib_ folder into the _/lib_ folder on the CIRCUITPY drive (create it if missing):
 
 - /adafruit_ble
-- /adafruit_ble_adafruit
-- /adafruit_bluefruit_connect
-- /adafruit_bus_device
 - /adafruit_hid
 - /adafruit_lsm6ds
 - /adafruit_register
-- adafruit_debouncer.mpy
-- adafruit_ticks.mpy
-- simpleio.mpy
+- /adafruit_bus_device
 
-  Unzip downloaded library file and copy required files onto the CIRCUITPY drive into the /lib directory.
+  > **Note**: The libraries are not stored in this repository. Always take them from the bundle that matches your CircuitPython version, otherwise they may not load.
 
-  > **Note**: The libraries are included in the release files but may be out of date. libraries version should be the same as boot loader. If you don't care about the latest versions, you can skip this step.
-
-4. To have control with battery charging current download the latest version of _[seeed_xiao_nrf52840.py](https://pypi.org/project/circuitpython-seeed-xiao-nrf52840/)_ or take it from release and place directly on the CIRCUITPY drive.
-
-   > **Note**: _seeed_xiao_nrf52840.py_ is included in the release files but may be out of date. If you don't care about the latest versions, you can skip this step.
+4. Copy _seeed_xiao_nrf52840.py_ from this repository directly onto the CIRCUITPY drive. It controls the battery charging current. A newer version may be available on [PyPI](https://pypi.org/project/circuitpython-seeed-xiao-nrf52840/).
 
 ## Programming the microcontroller
 
