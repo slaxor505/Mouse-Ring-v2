@@ -1,6 +1,6 @@
 
-*__init__.py
-*__init__.mpy
+# CircuitPython libraries are installed from the official bundle, not stored here
+lib/
 .venv/
 /images/rings_view.pptx
 Mouse_Ring_v2*
