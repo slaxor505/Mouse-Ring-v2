@@ -4,3 +4,5 @@ lib/
 .venv/
 /images/rings_view.pptx
 Mouse_Ring_v2*
+# personal editor settings
+.vscode/settings.json

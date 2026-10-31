@@ -100,6 +100,28 @@ Correct files structure on the CIRCUITPY:
 
 Reconnect device. Will be visible for Bluetooth and ready to connect.
 
+### Configuration options
+
+Settings in _config.py_ (copied from _left_config.py_ or _right_config.py_):
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `name` | `'Left Mouse Ring'` / `'Right Mouse Ring'` | Bluetooth name shown on the computer. |
+| `left_btn`, `right_btn`, `scrollup_btn`, `scrolldown_btn`, `power_btn` | see config file | Pins the joystick directions and push button are wired to. |
+| `mouse_movement` | `False` | `True` - joystick moves the pointer and push is left click. `False` - left/right click and scroll wheel. |
+| `deep_sleep_by_click` | `True` | `True` - holding left or right click for about 10 seconds enters Deep Sleep. Only used when `mouse_movement` is `False`. |
+| `advertising_battery_led` | `True` | `True` - while waiting for a Bluetooth connection the LED blinks in the battery colour (:green_circle: more then 80% or charged, :orange_circle: 20-80%, :red_circle: less then 20%). `False` - it blinks :large_blue_circle:. |
+
+Advanced settings. Their defaults are in _code.py_. To change one, add it to _config.py_ (e.g. `'pair_timeout': 30,`), and there is no need to edit _code.py_:
+
+| Option | Default | Description |
+| --- | --- | --- |
+| `pair_request_delay` | `3` | Seconds to wait after connecting for the computer to secure (encrypt) the link before the ring asks it to pair. |
+| `pair_timeout` | `20` | Seconds without a secured link before the ring blinks :red_circle: 3 times, disconnects and advertises again. |
+| `blink_interval` | `30000` | How often the status LEDs blink while connected (main loop cycles, lower is more frequent). |
+| `charge_current` | `0` | Battery charging current: `0` - 50 mA, `1` - 100 mA. |
+| `log_level` | `'info'` | Serial console detail: `'debug'`, `'info'`, `'warn'` or `'error'`. |
+
 ## Updating an existing ring
 
 Use these steps to move a ring from an older CircuitPython (e.g. 9.x) to 10.3.1 or newer and install the latest code. Repeat them for each ring.
