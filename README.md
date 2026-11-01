@@ -53,16 +53,17 @@ Waking up occurs by clicking the joystick.
 
 ## Pre-work with the microcontroller
 
-1. Download CircuitPython .uf2 dedicated boot loader from [here](https://circuitpython.org/board/Seeed_XIAO_nRF52840_Sense/).
+1. Download this repository: on GitHub click **Code → Download ZIP** and unzip it. The files to copy later are in it.
+2. Download the CircuitPython _.uf2_ file from [circuitpython.org/downloads](https://circuitpython.org/downloads). Search for _XIAO nRF52840_ and open the page that matches your board (e.g. [XIAO nRF52840 Sense](https://circuitpython.org/board/Seeed_XIAO_nRF52840_Sense/)). If the board already runs CircuitPython, the **Board ID** in _boot_out.txt_ on the CIRCUITPY drive tells you which one.
    Use **CircuitPython 10.3.1 or newer**: it fixes nRF52840 Bluetooth bonding bugs that can leave the ring connected with non-working buttons. Your current version is shown in _boot_out.txt_ on the CIRCUITPY drive.
-2. Installing CircuitPython on the microcontroller according the [instruction](https://learn.adafruit.com/welcome-to-circuitpython).
+3. Installing CircuitPython on the microcontroller according the [instruction](https://learn.adafruit.com/welcome-to-circuitpython).
    Simplifying: is needed to reset and enter "boot" mode by quickly pressing the "Reset" button twice.
 
    ![Seeed Xiao nRF52840](/images/xiao_nRF52840.png)
 
    Then copy the .uf2 file to the device. The microcontroller will reset automatically.
 
-3. Add the CircuitPython libraries. Download the bundle that matches your CircuitPython version (e.g. **10.x**) from the [official libraries](https://circuitpython.org/libraries) page and unzip it. Copy these folders from the bundle's _lib_ folder into the _/lib_ folder on the CIRCUITPY drive (create it if missing):
+4. Add the CircuitPython libraries. Download the bundle that matches your CircuitPython version (e.g. **10.x**) from the [official libraries](https://circuitpython.org/libraries) page and unzip it. Copy these folders from the bundle's _lib_ folder into the _/lib_ folder on the CIRCUITPY drive (create it if missing):
 
 - /adafruit_ble
 - /adafruit_hid
@@ -72,7 +73,7 @@ Waking up occurs by clicking the joystick.
 
   > **Note**: The libraries are not stored in this repository. Always take them from the bundle that matches your CircuitPython version, otherwise they may not load.
 
-4. Copy _seeed_xiao_nrf52840.py_ from this repository directly onto the CIRCUITPY drive. It controls the battery charging current. A newer version may be available on [PyPI](https://pypi.org/project/circuitpython-seeed-xiao-nrf52840/).
+5. Copy _seeed_xiao_nrf52840.py_ from this repository directly onto the CIRCUITPY drive. It controls the battery charging current. A newer version may be available on [PyPI](https://pypi.org/project/circuitpython-seeed-xiao-nrf52840/).
 
 ## Programming the microcontroller
 
@@ -98,7 +99,12 @@ Correct files structure on the CIRCUITPY:
 
 ![Files](/images/files.png)
 
-Reconnect device. Will be visible for Bluetooth and ready to connect.
+3. Pair with the computer
+
+- The ring restarts by itself after the files are copied (or press the reset button). While waiting for a connection the LED blinks every second in the battery colour, or :large_blue_circle: if `advertising_battery_led` is `False`.
+- In Windows: _Settings → Bluetooth & devices → Add device → Bluetooth_ and choose the ring by its `name` (e.g. _Left Mouse Ring_).
+- After connecting, the :large_blue_circle: LED stays on for a few seconds while the connection is secured. Then the buttons work.
+- If the LED blinks :red_circle: 3 times instead, see [Troubleshooting](#troubleshooting).
 
 ### Configuration options
 
