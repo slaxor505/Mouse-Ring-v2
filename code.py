@@ -5,6 +5,7 @@ import digitalio
 import supervisor
 import storage
 import alarm
+import microcontroller
 from adafruit_hid.mouse import Mouse
 # from adafruit_debouncer import Button
 from digitalio import DigitalInOut, Direction, Pull
@@ -31,6 +32,7 @@ config = {
     'log_to_disk': False,
     'blink_interval': 30000,        # lower to blink status more frequently
     'advertising_battery_led': True,  # True - blink battery level colour while waiting for connection; False - blink blue
+    'restart_hold': 2,              # seconds to hold the joystick push to restart the ring (0 - off). Only when mouse_movement is False
     'debounce_sleep': 0.15,         # for button debounce
     'sp_initial': 0.2,              # scroll settings
     'sp_accel': 0.015,              # scroll acceleration
@@ -147,6 +149,12 @@ if config['mouse_movement']:
     enter_BTN = digitalio.DigitalInOut(config['power_btn'])
     enter_BTN.direction = Direction.INPUT
     enter_BTN.pull = Pull.UP
+# without mouse movement the joystick push is free while connected: holding it restarts the ring
+restart_BTN = None
+if not config['mouse_movement'] and config['restart_hold'] > 0:
+    restart_BTN = digitalio.DigitalInOut(config['power_btn'])
+    restart_BTN.direction = Direction.INPUT
+    restart_BTN.pull = Pull.UP
 
 # set mouse
 mouse = Mouse(hid.devices)
@@ -293,6 +301,23 @@ def ensure_paired():
     return False
 
 
+# Restart the ring - a fresh connection fixes a link the host stopped listening to
+def restart_ring():
+    log('info', "Restart requested by holding the joystick push")
+    for connection in ble.connections:
+        try:
+            connection.disconnect()
+        except ConnectionError:
+            pass
+    leds_off()
+    for _ in range(3):
+        blue_led.value = False
+        time.sleep(0.1)
+        blue_led.value = True
+        time.sleep(0.1)
+    microcontroller.reset()
+
+
 # Deep Sleep
 def enter_sleep():
     # Disconnect cleanly so the host isn't left waiting for the link to time out
@@ -318,6 +343,8 @@ def enter_sleep():
     if config['mouse_movement']:
         switch_alarm = alarm.pin.PinAlarm(pin=board.D0, value=False, edge=False, pull=True) # fake pin, not connected
     else:
+        if restart_BTN is not None:
+            restart_BTN.deinit()    # free the pin for the wake alarm
         switch_alarm = alarm.pin.PinAlarm(pin=config['power_btn'], value=False, edge=False, pull=True)
     # Enter sleep until the alarm is triggered
     log('info', "Enter to Deep Sleep")
@@ -493,6 +520,14 @@ while True:
                 DEBOUNCE_TIME = get_delay_time(scroll_sleep)
                 mouse.move(wheel=-1)
                 log('info',"Down Button is pressed")
+
+        elif restart_BTN is not None and restart_BTN.value is False:
+            last_activity_time = time.monotonic()  # Reset the idle timer
+            start_time = time.monotonic()
+            while restart_BTN.value is False:
+                if time.monotonic() - start_time >= config['restart_hold']:
+                    restart_ring()
+            start_time = None
 
         elif config['mouse_movement']:
             if enter_BTN.value is False:
