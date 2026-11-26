@@ -117,7 +117,7 @@ Settings in _config.py_ (copied from _left_config.py_ or _right_config.py_):
 | `mouse_movement` | `False` | `True` - joystick moves the pointer and push is left click. `False` - left/right click and scroll wheel. |
 | `deep_sleep_by_click` | `True` | `True` - holding left or right click for about 10 seconds enters Deep Sleep. Only used when `mouse_movement` is `False`. |
 | `advertising_battery_led` | `True` | `True` - while waiting for a Bluetooth connection the LED blinks in the battery colour (:green_circle: more then 80% or charged, :orange_circle: 20-80%, :red_circle: less then 20%). `False` - it blinks :large_blue_circle:. |
-| `restart_hold` | `2` | Seconds to hold the joystick push while connected to restart the ring, `0` - off. Only used when `mouse_movement` is `False` (there the push is the left click). |
+| `restart_hold` | `2` | Seconds to hold the joystick push while connected to restart the ring, `0` - off. Only used when `mouse_movement` is `False`, because in pointer mode the push is the left click. |
 
 Advanced settings. Their defaults are in _code.py_. To change one, add it to _config.py_ (e.g. `'pair_timeout': 30,`), and there is no need to edit _code.py_:
 
