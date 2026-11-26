@@ -126,7 +126,8 @@ Advanced settings. Their defaults are in _code.py_. To change one, add it to _co
 | `pair_timeout` | `20` | Seconds without a secured link before the ring blinks :red_circle: 3 times, disconnects and advertises again. |
 | `blink_interval` | `30000` | How often the status LEDs blink while connected (main loop cycles, lower is more frequent). |
 | `charge_current` | `0` | Battery charging current: `0` - 50 mA, `1` - 100 mA. |
-| `log_level` | `'info'` | Serial console detail: `'debug'`, `'info'`, `'warn'` or `'error'`. |
+| `log_level` | `'info'` | Log detail: `'debug'`, `'info'`, `'warn'` or `'error'`. |
+| `log_to_disk` | `False` | `True` - also write the log to _logfile.log_ on the ring (see [Collecting a log](#collecting-a-log)). |
 
 ## Updating an existing ring
 
@@ -201,3 +202,14 @@ If the 3 red blinks keep repeating:
 1. Remove the ring in Windows Bluetooth settings and pair it again.
 2. Make sure the ring runs CircuitPython 10.3.1 or newer (see _boot_out.txt_), with libraries from the matching bundle.
 3. To see what happens, connect the ring by USB and open the serial console (e.g. with [Mu](https://codewith.mu/) or [Thonny](https://thonny.org/)). Messages such as `Link not encrypted, requesting pairing` show each step.
+
+### Collecting a log
+
+When a problem happens away from the computer, the ring can write its log to a file.
+
+1. Add `'log_to_disk': True,` to _config.py_.
+2. Unplug USB and use the ring as usual. Logging only works on battery, because while USB is connected the computer controls the drive.
+3. When the problem happens, note roughly what you did (e.g. "PC woke from sleep, pressed left click 3 times, nothing happened").
+4. Plug in USB and **press the reset button once**. This frees the drive for the computer without starting a new log.
+5. Copy _logfile.log_ from CIRCUITPY. Older runs are in _logfile.log.0_ (newest) to _logfile.log.2_. Every wake from Deep Sleep starts a new file.
+6. Set `'log_to_disk'` back to `False` when done. Writing the log costs some battery and adds flash wear.

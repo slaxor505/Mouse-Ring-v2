@@ -63,12 +63,18 @@ LLVL={'debug': 0, 'info': 1, 'warn': 2, 'error':3}
 logfile_handle = None
 if config['log_to_disk']:
     try:
+        # fails while USB is connected - the computer owns the drive then
         storage.remount("/",readonly=False)
-        if "logfile.log" in os.listdir():
-            os.rename("logfile.log","logfile.log.0")
-        for i in reversed(range(3)):
-            if f"logfile.log.{i}" in os.listdir():
+        # keep the last 3 runs: logfile.log.0 (newest) .. logfile.log.2 (oldest).
+        # A rename can't replace an existing file, so drop the oldest first.
+        files = os.listdir()
+        if "logfile.log.2" in files:
+            os.remove("logfile.log.2")
+        for i in (1, 0):
+            if f"logfile.log.{i}" in files:
                 os.rename(f"logfile.log.{i}",f"logfile.log.{i+1}")
+        if "logfile.log" in files:
+            os.rename("logfile.log","logfile.log.0")
         logfile_handle = open("logfile.log","w")
     except (OSError, RuntimeError):
         pass
@@ -94,6 +100,7 @@ backtrace = supervisor.get_previous_traceback()
 if backtrace is not None:
     log('error',"Previous run crashed.. backtrace follows...")
     log('error',backtrace)
+log('info',f"Start: CircuitPython {os.uname().release}, run reason: {supervisor.runtime.run_reason}, wake alarm: {alarm.wake_alarm}")
 
 
 ######################
@@ -207,14 +214,14 @@ def get_batt_percent(volts):
     return percent
 
 
-def battery_leds():
+def battery_leds(log_level='info'):
     # set green/orange/red LED based on battery state/level.
     # 3.7V lithium ion battery can be considered dead (completely discharged) at a voltage of 3.4V
     volts = battery.voltage
     percent = get_batt_percent(volts)
 
     charge_status = battery.charge_status
-    log('info',f"Voltage: {battery.voltage}V Charge: {percent}% Charging: {not charge_status}")
+    log(log_level,f"Voltage: {battery.voltage}V Charge: {percent}% Charging: {not charge_status}")
     #if volts > 3.7:
     if charge_status:
         green_led.value = False  # turn on LED
@@ -264,7 +271,7 @@ def ensure_paired():
         except ConnectionError:
             break   # link dropped between checks
         if paired:
-            log('info', "Link encrypted")
+            log('info', f"Link encrypted after {time.monotonic() - start:.1f}s")
             leds_off()
             return True
         elapsed = time.monotonic() - start
@@ -339,9 +346,9 @@ while True:
             if time.monotonic() - last_activity_time > IDLE_TIMEOUT:
                 enter_sleep()
 
-            log('info',"Connecting...")
+            log('debug',"Connecting...")
             if config['advertising_battery_led']:
-                battery_leds()  # blink in the battery level colour
+                battery_leds('debug')  # blink in the battery level colour
             else:
                 blue_led.value = False
             time.sleep(0.5)
