@@ -74,6 +74,7 @@ Waking up occurs by clicking the joystick.
   > **Note**: The libraries are not stored in this repository. Always take them from the bundle that matches your CircuitPython version, otherwise they may not load.
 
 5. Copy _seeed_xiao_nrf52840.py_ from this repository directly onto the CIRCUITPY drive. It controls the battery charging current. A newer version may be available on [PyPI](https://pypi.org/project/circuitpython-seeed-xiao-nrf52840/).
+6. Copy _settings.toml_ from this repository onto the CIRCUITPY drive. If the drive already has one, add the line `CIRCUITPY_BLE_WORKFLOW = false` to it instead. It turns off CircuitPython's Bluetooth file and REPL access ("BLE workflow"). That feature is not used here, and when it is on, the computer can reconnect at power-on before the mouse is ready, leaving the buttons dead.
 
 ## Programming the microcontroller
 
@@ -165,6 +166,7 @@ Use these steps to move a ring from an older CircuitPython (e.g. 9.x) to 10.3.1 
 5. Copy the new code from the ZIP onto CIRCUITPY, replacing the old files:
    - _code.py_
    - _seeed_xiao_nrf52840.py_
+   - _settings.toml_ (or add `CIRCUITPY_BLE_WORKFLOW = false` to your existing one)
    - _left_config.py_ renamed to _config.py_ for the left ring, or _right_config.py_ renamed to _config.py_ for the right ring.
 
    If you changed your old _config.py_ (name, pins, `mouse_movement`, ...), make the same changes in the new one. Your backup has the old file.
@@ -192,6 +194,8 @@ If something goes wrong:
 ## Troubleshooting
 
 ### Ring is connected but buttons do nothing
+
+**Right after switching the ring on:** check that CIRCUITPY has _settings.toml_ with `CIRCUITPY_BLE_WORKFLOW = false`. Without it, CircuitPython's BLE workflow advertises before _code.py_ starts, and the computer connects before the mouse service exists. After adding it, remove the ring in Windows Bluetooth settings and pair it again once, because the ring's list of Bluetooth services changes. The log shows `Connected before code.py started` when this happens.
 
 The mouse buttons only work over an encrypted (paired) Bluetooth link. If the computer and the ring disagree about their pairing keys, Windows shows the ring as connected but ignores its buttons.
 
