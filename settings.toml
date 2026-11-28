@@ -1,0 +1,7 @@
+# CircuitPython settings - copy this file to the CIRCUITPY drive.
+
+# Turn off the BLE workflow (Bluetooth file and REPL access). This project
+# doesn't use it, and once the ring is paired it advertises at power-on
+# before code.py runs. The computer then reconnects before the mouse
+# service exists, and the buttons don't work on that connection.
+CIRCUITPY_BLE_WORKFLOW = false

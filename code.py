@@ -135,6 +135,10 @@ scan_response = Advertisement()
 scan_response.complete_name = config['name']
 ble = adafruit_ble.BLERadio()
 ble.name = config['name'] # set name after connection
+if ble.connected:
+    # code.py hasn't advertised yet, so the BLE workflow accepted this connection
+    # before the mouse service existed - the buttons may not work on it
+    log('warn', "Connected before code.py started. Add CIRCUITPY_BLE_WORKFLOW = false to settings.toml")
 
 # set buttons
 left_BTN = digitalio.DigitalInOut(config['left_btn'])
